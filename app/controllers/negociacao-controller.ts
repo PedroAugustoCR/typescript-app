@@ -1,3 +1,4 @@
+import { DiaDaSemana } from '../enums/dias-da-semana.js';
 import { Negociacao } from '../models/negociacao.js';
 import { Negociacoes } from '../models/negociacoes.js';
 import { MensagemView } from '../views/menagem-view.js';
@@ -20,9 +21,14 @@ export class NegociacaoController {
 
   adiciona(): void {
     const negociacao = this.criaNegociacao();
+    if (!this.ehDiaUtil(negociacao.data)) {
+      this.mensagemView.update('Apenas negociações em dias úteis são aceitas');
+      return;
+    }
     this.negociacoes.adiciona(negociacao);
     this.limparFormulario();
     this.atualizaView();
+
   }
 
   private criaNegociacao(): Negociacao {
@@ -31,6 +37,10 @@ export class NegociacaoController {
     const quantidade = parseInt(this.inputQuantidade.value);
     const valor = parseFloat(this.inputValor.value);
     return new Negociacao(date, quantidade, valor);
+  }
+
+  private ehDiaUtil(data: Date): boolean {
+    return data.getDay() > DiaDaSemana.DOMINGO && data.getDay() < DiaDaSemana.SABADO;
   }
 
   private limparFormulario(): void {
